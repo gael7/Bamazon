@@ -70,7 +70,8 @@ var bamazonC={
                             var total=answers.quantity*product.Price;
                             var inventory=product.StockQuantity-answers.quantity;
                             console.log('You just bought '+answers.quantity+ ' '+product.ProductName+" your total was "+total);
-                            bamazon.lessInventory(inventory, product.ItemID  );
+                            bamazonC.lessInventory(inventory, product.ItemID);
+                            bamazonC.selectDepartment(total, product.DepartmentName);
                           }
                         i++;
                     }
@@ -84,8 +85,31 @@ var bamazonC={
         console.log("check mysql workbench");
         return;
       });
+    },
 
-    }
+    selectDepartment: function(total, departments){
+      var newSales;
+      conn.query('SELECT * FROM Departments WHERE DepartmentName="'+departments+'"', function(err, res){
+        if (err) throw err;
+        var i = 0;
+        while(i<res.length){
+            var department = res[i];
+            console.log(department.TotalSales);
+            newSales=department.TotalSales+total;
+            console.log(newSales);
+            bamazonC.updateSales(newSales, departments);
+            i++;
+            }
+      });
+    },
+    updateSales: function(total, department){
+      console.log(total+" to change "+department);
+      conn.query('UPDATE Departments SET TotalSales='+total+' WHERE DepartmentName="'+department+'"', function (err, res){
+        if (err) throw err;
+        console.log("check mysql workbench");
+        return;
+    });
+  }
 
 };
 
